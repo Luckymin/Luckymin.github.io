@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第三方控件 android floating action button 解析 (part1) - FloatingActionButton | Hexo | null</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="Android第三方开源项目解析">
+  <meta name="description" content="android-floating-action-button 是github上的开源库,是根据 Material Design 中提到的 Floating action button 所写的。支持的最低版本号为 14。如果你需要支持旧的android版本可以使用他人维护的另外一个版本，这一版本的的 minSdkVersion = 4。另外FloatingActionButton这个库没有实现 ‘快">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第三方控件 android floating action button 解析 (part1) - FloatingActionButton">
+<meta property="og:url" content="http://yoursite.com/2016/03/03/2016030311_android_floating_action_button_part1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="android-floating-action-button 是github上的开源库,是根据 Material Design 中提到的 Floating action button 所写的。支持的最低版本号为 14。如果你需要支持旧的android版本可以使用他人维护的另外一个版本，这一版本的的 minSdkVersion = 4。另外FloatingActionButton这个库没有实现 ‘快">
+<meta property="og:image" content="http://7xpaar.com1.z0.glb.clouddn.com/buttons.png">
+<meta property="og:image" content="http://7xpaar.com1.z0.glb.clouddn.com/floating_action_button_fab_bg_normal.png">
+<meta property="og:image" content="http://7xpaar.com1.z0.glb.clouddn.com/floating_action_button_ssssss.jpg">
+<meta property="og:image" content="http://7xpaar.com1.z0.glb.clouddn.com/81169DB3-3F0E-451E-998C-F10566FFBDAC.png">
+<meta property="og:updated_time" content="2016-03-09T04:58:45.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第三方控件 android floating action button 解析 (part1) - FloatingActionButton">
+<meta name="twitter:description" content="android-floating-action-button 是github上的开源库,是根据 Material Design 中提到的 Floating action button 所写的。支持的最低版本号为 14。如果你需要支持旧的android版本可以使用他人维护的另外一个版本，这一版本的的 minSdkVersion = 4。另外FloatingActionButton这个库没有实现 ‘快">
+  
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <nav id="menu" class="hide" >
+   <div class="inner">
+  <a href="javascript:;" class="header-icon waves-circle-light" id="menu-off">
+      <i class="icon icon-lg icon-close"></i>
+  </a>
+  <div class="brand-wrap">
+    <div class="brand">
+      <a href="./" class="avatar"><img src="/img/logo.png"></a>
+      <hgroup class="introduce">
+        <h5 class="nickname">John Doe</h5>
+        <a href="mailto:undefined" title="kluckymin@gmail.com" class="mail">kluckymin@gmail.com</a>
+      </hgroup>
+    </div>
+  </div>
+  <ul class="nav">
+    
+        <li class="waves-block">
+          <a href="/"  >
+            <i class="icon icon-lg icon-home"></i>Home
+          </a>
+        </li>
+    
+        <li class="waves-block">
+          <a href="/archives"  >
+            <i class="icon icon-lg icon-archives"></i>Archives
+          </a>
+        </li>
+    
+        <li class="waves-block">
+          <a href="/tags"  >
+            <i class="icon icon-lg icon-tags"></i>Tags
+          </a>
+        </li>
+    
+        <li class="waves-block">
+          <a href="https://github.com/Luckymin" target="_blank" >
+            <i class="icon icon-lg icon-github"></i>Github
+          </a>
+        </li>
+    
+        <li class="waves-block">
+          <a href="http://weibo.com/staringmake" target="_blank" >
+            <i class="icon icon-lg icon-weibo"></i>Weibo
+          </a>
+        </li>
+    
+  </ul>
+
+  <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Hexo &copy; 2016</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+</div>
+
+  </nav>
+  <main id="main">
+    <header class="header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-circle-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">第三方控件 android floating action button 解析 (part1) - FloatingActionButton</div>
+        <a href="javascript:;" class="header-icon waves-circle-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+    </div>
+</header>
+<header class="content-header">
+  <div class="container">
+    <h1 class="author">第三方控件 android floating action button 解析 (part1) - FloatingActionButton</h1>
+    <h5 class="subtitle">2016-03-03</h5>
+  </div>
+</header>
+
+    <div class="container body-wrap">
+      
+  <article id="post-2016030311_android_floating_action_button_part1" class="article article-type-post" itemscope itemprop="blogPost">
+    
+      <div class="post-meat flex-row">
+        <div class="flex-col">
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android第三方开源项目解析/">Android第三方开源项目解析</a></li></ul>
+</div>
+      </div>
+      <div class="post-body">
+
+        <aside class="post-widget" id="post-widget">
+
+          
+          <div class="post-share" id="post-share" data-title="第三方控件 android floating action button 解析 (part1) - FloatingActionButton" data-pic="/img/logo.png" data-summary="&lt;p&gt;&lt;a href=&quot;https://github.com/futuresimple/android-floating-action-button&quot;&gt;android-floating-action-button&lt;/a&gt; 是github上的开源库,是根据 &lt;a href=&quot;http://www.google.com/design/spec/components/buttons.html&quot;&gt;Material Design&lt;/a&gt; 中提到的 Floating action button 所写的。支持的最低版本号为 14。如果你需要支持旧的android版本可以使用他人维护的另外一个版本，&lt;a href=&quot;https://github.com/str4d/android-floating-action-button&quot;&gt;这一版本的的 minSdkVersion = 4&lt;/a&gt;。另外FloatingActionButton这个库没有实现 ‘快速返回’ （原文中是 ‘quick return’ 不知道没有没更好的说法）这个功能，即按钮在列表向下滚时消失，向上滚时显示。作者认为这个功能应该由另外一个组件来实现，而不是按钮本身来做这件事情。如果你需要这一功能可以使用 &lt;a href=&quot;https://github.com/makovkastar&quot;&gt;Oleksandr Melnykov&lt;/a&gt; 的 &lt;a href=&quot;https://github.com/makovkastar/FloatingActionButton&quot;&gt;FloatingActionButton&lt;/a&gt; ，这个库就是以本文的 &lt;a href=&quot;https://github.com/futuresimple/android-floating-action-button&quot;&gt;android-floating-action-button&lt;/a&gt; 为基础所写的。&lt;/p&gt;" data-url="http://yoursite.com/2016/03/03/2016030311_android_floating_action_button_part1/index.html">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+          
+
+          
+          <nav class="post-toc-wrap" id="post-toc">
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#FloatingActionButton"><span class="post-toc-text">FloatingActionButton</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#u521D_u59CB_u5316"><span class="post-toc-text">初始化</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#LayerDrawable"><span class="post-toc-text">LayerDrawable</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#u7B2C_u4E00_u5C42_png__u56FE_u7247"><span class="post-toc-text">第一层 png 图片</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#u7B2C_u4E8C_u5C42__u5706_u5F62_u586B_u5145Drawable"><span class="post-toc-text">第二层 圆形填充Drawable</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#u7B2C_u4E09_u5C42__u9ED1_u8272_u7684_u5706_u5F62_u8FB9_u6846_u7EBF"><span class="post-toc-text">第三层 黑色的圆形边框线</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#u7B2C_u56DB_u5C42_icon"><span class="post-toc-text">第四层 icon</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#u6700_u540E"><span class="post-toc-text">最后</span></a></li></ol></li></ol>
+          </nav>
+          
+        </aside>
+
+        <div class="post-main">
+
+            <div class="post-content" itemprop="postContent"><p><a href="https://github.com/futuresimple/android-floating-action-button" target="_blank" rel="external">android-floating-action-button</a> 是github上的开源库,是根据 <a href="http://www.google.com/design/spec/components/buttons.html" target="_blank" rel="external">Material Design</a> 中提到的 Floating action button 所写的。支持的最低版本号为 14。如果你需要支持旧的android版本可以使用他人维护的另外一个版本，<a href="https://github.com/str4d/android-floating-action-button" target="_blank" rel="external">这一版本的的 minSdkVersion = 4</a>。另外FloatingActionButton这个库没有实现 ‘快速返回’ （原文中是 ‘quick return’ 不知道没有没更好的说法）这个功能，即按钮在列表向下滚时消失，向上滚时显示。作者认为这个功能应该由另外一个组件来实现，而不是按钮本身来做这件事情。如果你需要这一功能可以使用 <a href="https://github.com/makovkastar" target="_blank" rel="external">Oleksandr Melnykov</a> 的 <a href="https://github.com/makovkastar/FloatingActionButton" target="_blank" rel="external">FloatingActionButton</a> ，这个库就是以本文的 <a href="https://github.com/futuresimple/android-floating-action-button" target="_blank" rel="external">android-floating-action-button</a> 为基础所写的。</p>
+<a id="more"></a> 
+<h1 id="FloatingActionButton"><a href="#FloatingActionButton" class="headerlink" title="FloatingActionButton"></a>FloatingActionButton</h1><p>FloatingActionButton 是这个库里面的最基础的控件，只要简单的在 xml 引用它，并进行简单的配置就可以实现如下效果</p>
+<p><img src="http://7xpaar.com1.z0.glb.clouddn.com/buttons.png" alt=""></p>
+<p>下面就让我们来看看这样一个悬浮按钮到底是怎么实现的吧</p>
+<h2 id="u521D_u59CB_u5316"><a href="#u521D_u59CB_u5316" class="headerlink" title="初始化"></a>初始化</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FloatingActionButton</span> <span class="keyword">extends</span> <span class="title">ImageButton</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">FloatingActionButton</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(context, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">FloatingActionButton</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, attrs);</span><br><span class="line">        init(context, attrs);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">FloatingActionButton</span><span class="params">(Context context, AttributeSet attrs, <span class="keyword">int</span> defStyle)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, attrs, defStyle);</span><br><span class="line">        init(context, attrs);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(Context context, AttributeSet attributeSet)</span> </span>&#123;</span><br><span class="line">        TypedArray attr = context.obtainStyledAttributes(attributeSet, R.styleable.FloatingActionButton, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">//正常状态下按钮的颜色</span></span><br><span class="line">        mColorNormal = attr.getColor(R.styleable.FloatingActionButton_fab_colorNormal, getColor(android.R.color.holo_blue_dark));</span><br><span class="line">        <span class="comment">//点击时按钮的颜色</span></span><br><span class="line">        mColorPressed = attr.getColor(R.styleable.FloatingActionButton_fab_colorPressed, getColor(android.R.color.holo_blue_light));</span><br><span class="line">        <span class="comment">//被禁用时按钮的颜色  enabled = false</span></span><br><span class="line">        mColorDisabled = attr.getColor(R.styleable.FloatingActionButton_fab_colorDisabled, getColor(android.R.color.darker_gray));</span><br><span class="line">        <span class="comment">//mSize决定悬浮圆形(不包括阴影)的大小 </span></span><br><span class="line">        mSize = attr.getInt(R.styleable.FloatingActionButton_fab_size, SIZE_NORMAL);</span><br><span class="line">        <span class="comment">//按钮图标</span></span><br><span class="line">        mIcon = attr.getResourceId(R.styleable.FloatingActionButton_fab_icon, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">//展开时的标签文字,仅当FloatingActionButton 是 FloatingActionMenu 的</span></span><br><span class="line">        mTitle = attr.getString(R.styleable.FloatingActionButton_fab_title);</span><br><span class="line">        <span class="comment">//是否显示边框线</span></span><br><span class="line">        mStrokeVisible = attr.getBoolean(R.styleable.FloatingActionButton_fab_stroke_visible, <span class="keyword">true</span>);</span><br><span class="line">        attr.recycle();</span><br><span class="line"></span><br><span class="line">        updateCircleSize();</span><br><span class="line">        <span class="comment">//阴影半径 mShadowRadius = 9dp</span></span><br><span class="line">        mShadowRadius = getDimension(R.dimen.fab_shadow_radius);</span><br><span class="line">        <span class="comment">//阴影偏移量 mShadowOffset = 3dp</span></span><br><span class="line">        mShadowOffset = getDimension(R.dimen.fab_shadow_offset);</span><br><span class="line">        updateDrawableSize();</span><br><span class="line"></span><br><span class="line">        updateBackground();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>FloatingActionButton继承自ImageButton，所有的构造方法最终都会调用 init() ，init() 我做了详细的注释，关于 mShadowRadius 和 mShadowOffset 这2个变量后面会解释，这里就先跳过。</p>
+<p>第35行的 updateCircleSize() 根据 mSize 确定 mCircleSize 等于 56dp 还是 40dp ，mCircleSize 的大小其实就是悬浮圆形的大小，代码如下</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * 设置mCircleSize的值  如果 mSize = SIZE_NORMAL 则圆为56dp , mSize = SIZE_MINI 则圆为40dp</span><br><span class="line"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">updateCircleSize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    mCircleSize = getDimension(mSize == SIZE_NORMAL ? R.dimen.fab_size_normal : R.dimen.fab_size_mini);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第40行的 updateDrawableSize() 根据悬浮圆形的 size 和阴影的长度计算这个自定义 View 的 size，mDrawableSize 其实就是 View 长和宽，我们可以把 onMeasure 贴出来一起看下，代码如下：</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> * 计算view的大小, 圆大小 + 左右两边的阴影长度</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">void</span> <span class="title">updateDrawableSize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    mDrawableSize = (<span class="keyword">int</span>) (mCircleSize + <span class="number">2</span> * mShadowRadius);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@Override</span></span><br><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onMeasure(widthMeasureSpec, heightMeasureSpec);</span><br><span class="line">    setMeasuredDimension(mDrawableSize, mDrawableSize);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>onMeasure() 里面的代码非常的简单，仅仅只是调用了 setMeasuredDimension() 设置控件的长和宽。</p>
+<p>最后第42行的 updateBackground() 就是重头戏了，我们先来看下代码</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">updateBackground</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">float</span> strokeWidth = getDimension(R.dimen.fab_stroke_width);</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">float</span> halfStrokeWidth = strokeWidth / <span class="number">2</span>f;</span><br><span class="line"></span><br><span class="line">    LayerDrawable layerDrawable = <span class="keyword">new</span> LayerDrawable(<span class="keyword">new</span> Drawable[]&#123;</span><br><span class="line">            getResources().getDrawable(mSize == SIZE_NORMAL ? R.drawable.fab_bg_normal : R.drawable.fab_bg_mini),</span><br><span class="line">            createFillDrawable(strokeWidth),</span><br><span class="line">            createOuterStrokeDrawable(strokeWidth),</span><br><span class="line">            getIconDrawable()</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> iconOffset = (<span class="keyword">int</span>) (mCircleSize - getDimension(R.dimen.fab_icon_size)) / <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> circleInsetHorizontal = (<span class="keyword">int</span>) (mShadowRadius);</span><br><span class="line">    <span class="keyword">int</span> circleInsetTop = (<span class="keyword">int</span>) (mShadowRadius - mShadowOffset);</span><br><span class="line">    <span class="keyword">int</span> circleInsetBottom = (<span class="keyword">int</span>) (mShadowRadius + mShadowOffset);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//第二层drawable 设置圆的偏移量 setLayerInset(layer, leftOffset, topOffset, rightOffset, bottomOffset)</span></span><br><span class="line">    layerDrawable.setLayerInset(<span class="number">1</span>,</span><br><span class="line">            circleInsetHorizontal,</span><br><span class="line">            circleInsetTop,</span><br><span class="line">            circleInsetHorizontal,</span><br><span class="line">            circleInsetBottom);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//第三层drawable 设置最外层边框的偏移量</span></span><br><span class="line">    layerDrawable.setLayerInset(<span class="number">2</span>,</span><br><span class="line">            (<span class="keyword">int</span>) (circleInsetHorizontal - halfStrokeWidth),</span><br><span class="line">            (<span class="keyword">int</span>) (circleInsetTop - halfStrokeWidth),</span><br><span class="line">            (<span class="keyword">int</span>) (circleInsetHorizontal - halfStrokeWidth),</span><br><span class="line">            (<span class="keyword">int</span>) (circleInsetBottom - halfStrokeWidth));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//第四层drawable 将图标设置为居中</span></span><br><span class="line">    layerDrawable.setLayerInset(<span class="number">3</span>,</span><br><span class="line">            circleInsetHorizontal + iconOffset,</span><br><span class="line">            circleInsetTop + iconOffset,</span><br><span class="line">            circleInsetHorizontal + iconOffset,</span><br><span class="line">            circleInsetBottom + iconOffset);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//设置背景图片</span></span><br><span class="line">    setBackgroundCompat(layerDrawable);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先让我们忽略中间的一堆代码，只看第 5 行和第 40 行，就会发现这段代码还是蛮简单的，第 5 行创建了一个 Drawable，第 40 行调用 setBackgroundCompat() 设置背景图片。其实就是我们平常的设置背景图片的过程，重点就是怎么为这个 Drawable 加上圆形、阴影、点击变色等效果了，首先我们需要先了解下 LayerDrawable 是什么东西。</p>
+<h3 id="LayerDrawable"><a href="#LayerDrawable" class="headerlink" title="LayerDrawable"></a>LayerDrawable</h3><p>LayerDrawable是Drawable的子类，这是一个用于管理 Drawable 的数组，可以将Drawable按照顺序进行绘制，拥有最大索引的 Drawable 将被绘制在最上层，它可以对应xml中的 layer-list<br>比如在 drawable/layer.xml 中</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;layer-<span class="type">list</span> xmlns:android=<span class="string">"http://schemas.android.com/apk/res/android"</span>&gt;  </span><br><span class="line">    &lt;<span class="property">item</span> android:drawable=<span class="string">"@android:color/white"</span> /&gt;  </span><br><span class="line">    &lt;<span class="property">item</span> android:drawable=<span class="string">"@drawable/logo"</span> /&gt;  </span><br><span class="line">&lt;/layer-<span class="type">list</span>&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="u7B2C_u4E00_u5C42_png__u56FE_u7247"><a href="#u7B2C_u4E00_u5C42_png__u56FE_u7247" class="headerlink" title="第一层 png 图片"></a>第一层 png 图片</h3><p>了解完后我们来看上面代码创建的LayerDrawable</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">LayerDrawable layerDrawable = new LayerDrawable<span class="list">(<span class="keyword">new</span> Drawable[]&#123;</span><br><span class="line">        getResources<span class="list">()</span>.getDrawable<span class="list">(<span class="keyword">mSize</span> == SIZE_NORMAL ? R.drawable.fab_bg_normal : R.drawable.fab_bg_mini)</span>,//第一层</span><br><span class="line">        createFillDrawable<span class="list">(<span class="keyword">strokeWidth</span>)</span>,//第二层</span><br><span class="line">        createOuterStrokeDrawable<span class="list">(<span class="keyword">strokeWidth</span>)</span>,//第三层</span><br><span class="line">        getIconDrawable<span class="list">()</span>//第四层</span><br><span class="line">&#125;)</span><span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>第一层的 Drawable 是一张图片，根据 mSize 来决定是使用 fab_bg_normal 还是 fab_bg_mini 之前也说 mSize 决定了 mCircleSize 也就是悬浮圆的大小 ，这里面似乎有某种关系？我们先来看看 fab_bg_normal 是什么样子的( fab_bg_mini 只是小了一号就不贴出了)。</p>
+<p><img src="http://7xpaar.com1.z0.glb.clouddn.com/floating_action_button_fab_bg_normal.png" alt=""></p>
+<p>其实如果仔细观察图片的大小，圆形的大小，以及阴影的长度就能发现mDrawableSize (上文中在 onMeasure() 方法内设置的长和宽)就是 fab_bg_normal 图片的大小，mCircleSize 就是图中圆形的大小，mShadowRadius 就是图片中左右两边的阴影长度，mShadowOffset 是Y轴上的偏移量，向上偏移是为了加重底部的阴影，如下图所示。</p>
+<p><img src="http://7xpaar.com1.z0.glb.clouddn.com/floating_action_button_ssssss.jpg" alt=""></p>
+<h3 id="u7B2C_u4E8C_u5C42__u5706_u5F62_u586B_u5145Drawable"><a href="#u7B2C_u4E8C_u5C42__u5706_u5F62_u586B_u5145Drawable" class="headerlink" title="第二层 圆形填充Drawable"></a>第二层 圆形填充Drawable</h3><figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function">StateListDrawable <span class="title">createFillDrawable</span><span class="params">(<span class="keyword">float</span> strokeWidth)</span> </span>&#123;</span><br><span class="line">    StateListDrawable drawable = <span class="keyword">new</span> StateListDrawable();</span><br><span class="line">    <span class="comment">//禁用drawable</span></span><br><span class="line">    drawable.addState(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;-android.R.attr.state_enabled&#125;, createCircleDrawable(mColorDisabled, strokeWidth));</span><br><span class="line">    <span class="comment">//按下drawable</span></span><br><span class="line">    drawable.addState(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;android.R.attr.state_pressed&#125;, createCircleDrawable(mColorPressed, strokeWidth));</span><br><span class="line">    <span class="comment">//正常drawable</span></span><br><span class="line">    drawable.addState(<span class="keyword">new</span> <span class="keyword">int</span>[]&#123;&#125;, createCircleDrawable(mColorNormal, strokeWidth));</span><br><span class="line">    <span class="keyword">return</span> drawable;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里创建了一个StateListDrawable，然后为这个StateListDrawable创建了3种状态下的Drawable。分别是按钮被禁用时显示的Drawable，按钮被点击时显示的Drawable，按钮正常状态下的Drawable。如果不知道StateListDrawable是什么的话，那么看看下面的xml写法应该就懂了吧？</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;selector <span class="string">xmlns:</span>android=<span class="string">"http://schemas.android.com/apk/res/android"</span>&gt;</span><br><span class="line">    &lt;item <span class="string">android:</span>drawable=<span class="string">"@drawable/disabled"</span> <span class="string">android:</span>state_enabled=<span class="string">"false"</span>/&gt;</span><br><span class="line">    &lt;item <span class="string">android:</span>drawable=<span class="string">"@drawable/pressed"</span> <span class="string">android:</span>state_pressed=<span class="string">"true"</span>/&gt;</span><br><span class="line">    &lt;item <span class="string">android:</span>drawable=<span class="string">"@drawable/normal"</span>/&gt;</span><br><span class="line">&lt;/selector&gt;</span><br></pre></td></tr></table></figure>
+<p>我们平时经常写的 selector 最后都是会转换成 StateListDrawable 的。了解了 StateListDrawable 就让我们继续看 createCircleDrawable() 这个方法，看名字应该就能猜到这个方法应该是创建一个圆形的Drawable。</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Drawable createCircleDrawable(<span class="built_in">int</span> <span class="built_in">color</span>, <span class="built_in">float</span> strokeWidth) &#123;</span><br><span class="line">    <span class="comment">//拿到color中的透明度</span></span><br><span class="line">    <span class="built_in">int</span> <span class="built_in">alpha</span> = Color.<span class="built_in">alpha</span>(<span class="built_in">color</span>);</span><br><span class="line">    <span class="comment">//将color中的透明度去掉</span></span><br><span class="line">    <span class="built_in">int</span> opaqueColor = opaque(<span class="built_in">color</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建圆形的Drawable</span></span><br><span class="line">    ShapeDrawable fillDrawable = <span class="keyword">new</span> ShapeDrawable(<span class="keyword">new</span> OvalShape());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> Paint paint = fillDrawable.getPaint();</span><br><span class="line">    <span class="comment">//抗锯齿</span></span><br><span class="line">    paint.setAntiAlias(<span class="keyword">true</span>);</span><br><span class="line">    <span class="comment">//设置画笔颜色</span></span><br><span class="line">    paint.setColor(opaqueColor);</span><br><span class="line"></span><br><span class="line">    Drawable[] layers = &#123;</span><br><span class="line">            fillDrawable,</span><br><span class="line">            createInnerStrokesDrawable(opaqueColor, strokeWidth)<span class="comment">//渐变边框</span></span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//根据是否有透明度和是否显示边框来决定填充色是否显示透明</span></span><br><span class="line">    LayerDrawable drawable = <span class="built_in">alpha</span> == <span class="number">255</span> || !mStrokeVisible</span><br><span class="line">            ? <span class="keyword">new</span> LayerDrawable(layers)</span><br><span class="line">            : <span class="keyword">new</span> TranslucentLayerDrawable(<span class="built_in">alpha</span>, layers);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//边框线的内边距</span></span><br><span class="line">    <span class="built_in">int</span> halfStrokeWidth = (<span class="built_in">int</span>) (strokeWidth / <span class="number">2</span>f);</span><br><span class="line">    drawable.setLayerInset(<span class="number">1</span>, halfStrokeWidth, halfStrokeWidth, halfStrokeWidth, halfStrokeWidth);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> drawable;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>能看到 createCircleDrawable() 确实是创建了一个圆，而且还在这个圆上画了一个颜色渐变的边框，createInnerStrokesDrawable() 里做的事情就是将传入的 color 调亮或调暗或是改变透明度然后用着几个颜色做一个颜色渐变的边框，具体的代码就不贴出来了。第 22 行决定了圆的填充色是否要透明，28 行为这个渐变边框设置上下左右的偏移量（可以对照我们平时写布局时的layout_marginBottom、layout_marginTop来理解）。</p>
+<p>到这里第二层 Drawable 就创建完成了，当然我们还需要为第二层的 Drawable 设置偏移量，也就是 updateBackground() 里的这一段代码</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> circleInsetHorizontal = (<span class="keyword">int</span>) (mShadowRadius);</span><br><span class="line"><span class="keyword">int</span> circleInsetTop = (<span class="keyword">int</span>) (mShadowRadius - mShadowOffset);</span><br><span class="line"><span class="keyword">int</span> circleInsetBottom = (<span class="keyword">int</span>) (mShadowRadius + mShadowOffset);</span><br><span class="line"></span><br><span class="line"><span class="comment">//第二层drawable 设置圆的偏移量 setLayerInset(layer, leftOffset, topOffset, rightOffset, bottomOffset)</span></span><br><span class="line">layerDrawable.setLayerInset(<span class="number">1</span>,</span><br><span class="line">        circleInsetHorizontal,</span><br><span class="line">        circleInsetTop,</span><br><span class="line">        circleInsetHorizontal,</span><br><span class="line">        circleInsetBottom);</span><br></pre></td></tr></table></figure>
+<p>circleInsetHorizontal = 9dp，circleInsetTop = 6dp，circleInsetBottom = 12dp。可以发现设置偏移量后第二层的圆形 Drawable 刚好盖在了第一层图片的圆形上面。这二层 Drawable 叠加后的效果如图所示</p>
+<p><img src="http://7xpaar.com1.z0.glb.clouddn.com/81169DB3-3F0E-451E-998C-F10566FFBDAC.png" alt=""></p>
+<p>如果仔细观察也能看到悬浮圆形周围一圈有一个颜色渐变的圆环</p>
+<h3 id="u7B2C_u4E09_u5C42__u9ED1_u8272_u7684_u5706_u5F62_u8FB9_u6846_u7EBF"><a href="#u7B2C_u4E09_u5C42__u9ED1_u8272_u7684_u5706_u5F62_u8FB9_u6846_u7EBF" class="headerlink" title="第三层 黑色的圆形边框线"></a>第三层 黑色的圆形边框线</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Drawable <span class="title">createOuterStrokeDrawable</span><span class="params">(<span class="keyword">float</span> strokeWidth)</span> </span>&#123;</span><br><span class="line">    ShapeDrawable shapeDrawable = <span class="keyword">new</span> ShapeDrawable(<span class="keyword">new</span> OvalShape());</span><br><span class="line"></span><br><span class="line">    final Paint paint = shapeDrawable.getPaint();</span><br><span class="line">    paint.setAntiAlias(<span class="literal">true</span>);</span><br><span class="line">    paint.setStrokeWidth(strokeWidth);</span><br><span class="line">    paint.setStyle(Style.STROKE);</span><br><span class="line">    paint.setColor(Color.BLACK);</span><br><span class="line">    paint.setAlpha(opacityToAlpha(<span class="number">0.02f</span>));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> shapeDrawable;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">....</span><br><span class="line"><span class="comment">//第三层drawable 设置最外层边框的偏移量</span></span><br><span class="line">layerDrawable.setLayerInset(<span class="number">2</span>,</span><br><span class="line">        (<span class="keyword">int</span>) (circleInsetHorizontal - halfStrokeWidth),</span><br><span class="line">        (<span class="keyword">int</span>) (circleInsetTop - halfStrokeWidth),</span><br><span class="line">        (<span class="keyword">int</span>) (circleInsetHorizontal - halfStrokeWidth),</span><br><span class="line">        (<span class="keyword">int</span>) (circleInsetBottom - halfStrokeWidth));</span><br><span class="line">....</span><br></pre></td></tr></table></figure>
+<p>为了方便起见，将 updateBackground() 中的代码片段在了下面，代码非常的简单就不多解释了，值得一提的是，叠加上这一层 Drawable 后按钮便有2个边框了，一个是第二层的渐变边框，还有就是现在这个黑色的外边框了。</p>
+<h3 id="u7B2C_u56DB_u5C42_icon"><a href="#u7B2C_u56DB_u5C42_icon" class="headerlink" title="第四层 icon"></a>第四层 icon</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Drawable <span class="title">getIconDrawable</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (mIconDrawable != null) &#123;</span><br><span class="line">        <span class="keyword">return</span> mIconDrawable;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mIcon != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> getResources().getDrawable(mIcon);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ColorDrawable(Color.TRANSPARENT);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"><span class="comment">//fab_icon_size = 24dp</span></span><br><span class="line"><span class="keyword">int</span> iconOffset = (<span class="keyword">int</span>) (mCircleSize - getDimension(R.dimen.fab_icon_size)) / <span class="number">2</span>;</span><br><span class="line"><span class="comment">//第四层drawable 将图标设置为居中</span></span><br><span class="line">layerDrawable.setLayerInset(<span class="number">3</span>,</span><br><span class="line">        circleInsetHorizontal + iconOffset,</span><br><span class="line">        circleInsetTop + iconOffset,</span><br><span class="line">        circleInsetHorizontal + iconOffset,</span><br><span class="line">        circleInsetBottom + iconOffset);</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>getIconDrawable() 如果没有设置图标的话就返回一个透明的 ColorDrawable ，非常简单的逻辑。最后设置图标的偏移量让其居中，而且从这里也可以看出来，不管圆的大小是 56dp 还是 40dp 图标的大小都是 24dp。</p>
+<h2 id="u6700_u540E"><a href="#u6700_u540E" class="headerlink" title="最后"></a>最后</h2><p>FloatingActionButton 的代码其实非常的简单，首先根据 根据阴影底图也就是 fab_bg_norma/fab_bg_mini 赋值mShadowRadius = 9dp ，mShadowOffset = 3dp ，mCircleSize = 56dp/40dp ，mDrawableSize就是图片的大小。之后创建了一个 LayerDrawable，这个 LayerDrawable 总共有4层，系统会按照这些 Drawable 的顺序来绘制他们，这四份分别是：</p>
+<ul>
+<li>第一层：阴影底图 fab_bg_normal/fab_bg_mini 。</li>
+<li>第二层：一个填充圆和渐变的圆环。</li>
+<li>第三层：一个黑色的圆环，这个圆环是包围第二层的填充圆的。</li>
+<li>第四层：调用者设置的图标，这个图标的大小是24dp，且居中。</li>
+</ul>
+<p>最后在调用 setBackground 或 setBackgroundDrawable(minSdkVersion &gt;= 16) 设置背景。</p>
+<p>以上就是 FloatingActionButton 实现的全部过程，感谢您的阅读。</p>
+</div>
+
+            
+<nav class="post-nav flex-row">
+  <div class="flex-col waves-block prev">
+    
+      <a href="/2016/03/09/2016030311_android_floating_action_button_part2/" title="第三方控件 android floating action button 解析 (part2) - FloatingActionsMenu" id="post-prev" class="post-nav-link">
+        <i class="icon icon-chevron-left"></i>
+        <span class="article-nav-title">上一篇</span>
+      </a>
+    
+  </div>
+  <div class="flex-col waves-block next">
+    
+      <a href="/2016/02/27/2016022717_Activity的启动模式和匹配规则/" title="Activity的启动模式和匹配规则" id="post-next" class="post-nav-link">
+        <span class="article-nav-title">下一篇</span>
+        <i class="icon icon-chevron-right"></i>
+      </a>
+    
+  </div>
+
+</nav>
+
+
+
+            
+
+
+
+
+        </div>
+
+      </div>
+
+    
+
+  </article>
+
+
+
+    </div>
+  </main>
+<div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-circle-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+<div class="global-share" id="global-share" data-title="第三方控件 android floating action button 解析 (part1) - FloatingActionButton" data-pic="/img/logo.png" data-summary="&lt;p&gt;&lt;a href=&quot;https://github.com/futuresimple/android-floating-action-button&quot;&gt;android-floating-action-button&lt;/a&gt; 是github上的开源库,是根据 &lt;a href=&quot;http://www.google.com/design/spec/components/buttons.html&quot;&gt;Material Design&lt;/a&gt; 中提到的 Floating action button 所写的。支持的最低版本号为 14。如果你需要支持旧的android版本可以使用他人维护的另外一个版本，&lt;a href=&quot;https://github.com/str4d/android-floating-action-button&quot;&gt;这一版本的的 minSdkVersion = 4&lt;/a&gt;。另外FloatingActionButton这个库没有实现 ‘快速返回’ （原文中是 ‘quick return’ 不知道没有没更好的说法）这个功能，即按钮在列表向下滚时消失，向上滚时显示。作者认为这个功能应该由另外一个组件来实现，而不是按钮本身来做这件事情。如果你需要这一功能可以使用 &lt;a href=&quot;https://github.com/makovkastar&quot;&gt;Oleksandr Melnykov&lt;/a&gt; 的 &lt;a href=&quot;https://github.com/makovkastar/FloatingActionButton&quot;&gt;FloatingActionButton&lt;/a&gt; ，这个库就是以本文的 &lt;a href=&quot;https://github.com/futuresimple/android-floating-action-button&quot;&gt;android-floating-action-button&lt;/a&gt; 为基础所写的。&lt;/p&gt;" data-url="http://yoursite.com/2016/03/03/2016030311_android_floating_action_button_part1/index.html">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+<script type="text/javascript">
+var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cspan id='cnzz_stat_icon_1257735577' style='display:none' %3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s95.cnzz.com/z_stat.php%3Fid%3D1257735577%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+
+
+
+</body>
+</html>
