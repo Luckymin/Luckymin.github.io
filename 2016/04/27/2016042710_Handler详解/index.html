@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Android Handler 探索 | Min blog | Thought is already is late, exactly is the earliest time.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta name="keywords" content="Android 深入解析">
+  <meta name="description" content="众所周知在 UI 线程中不能执行耗时操作，否则 UI 线程将会堵塞造成应用卡顿甚至异常报错，因此我们往往会将耗时操作放在工作线程中，但是这些任务往往需要更新 UI 组件的状态，但是对 UI 组件的操作只能在 UI 线程中执行，Android 为了处理这个问题，提供了一个消息传递机制 Handler">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android Handler 探索">
+<meta property="og:url" content="http://yoursite.com/2016/04/27/2016042710_Handler详解/index.html">
+<meta property="og:site_name" content="Min blog">
+<meta property="og:description" content="众所周知在 UI 线程中不能执行耗时操作，否则 UI 线程将会堵塞造成应用卡顿甚至异常报错，因此我们往往会将耗时操作放在工作线程中，但是这些任务往往需要更新 UI 组件的状态，但是对 UI 组件的操作只能在 UI 线程中执行，Android 为了处理这个问题，提供了一个消息传递机制 Handler">
+<meta property="og:updated_time" content="2017-04-20T08:49:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android Handler 探索">
+<meta name="twitter:description" content="众所周知在 UI 线程中不能执行耗时操作，否则 UI 线程将会堵塞造成应用卡顿甚至异常报错，因此我们往往会将耗时操作放在工作线程中，但是这些任务往往需要更新 UI 组件的状态，但是对 UI 组件的操作只能在 UI 线程中执行，Android 为了处理这个问题，提供了一个消息传递机制 Handler">
+  
+    <link rel="alternative" href="/atom.xml" title="Min blog" type="application/atom+xml">
+  
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+<body>
+  <div id="loading" class="active"></div>
+
+  <nav id="menu" class="hide" >
+   <div class="inner">
+  <a href="javascript:;" class="header-icon waves-circle-light" id="menu-off">
+      <i class="icon icon-lg icon-close"></i>
+  </a>
+  <div class="brand-wrap">
+    <div class="brand">
+      <a href="./" class="avatar"><img src="/img/logo.jpeg"></a>
+      <hgroup class="introduce">
+        <h5 class="nickname">花生牛奶巧克力</h5>
+        <a href="mailto:undefined" title="kluckymin@gmail.com" class="mail">kluckymin@gmail.com</a>
+      </hgroup>
+    </div>
+  </div>
+  <ul class="nav">
+    
+        <li class="waves-block">
+          <a href="/"  >
+            <i class="icon icon-lg icon-home"></i>Home
+          </a>
+        </li>
+    
+        <li class="waves-block">
+          <a href="/archives"  >
+            <i class="icon icon-lg icon-archives"></i>Archives
+          </a>
+        </li>
+    
+        <li class="waves-block">
+          <a href="/tags"  >
+            <i class="icon icon-lg icon-tags"></i>Tags
+          </a>
+        </li>
+    
+        <li class="waves-block">
+          <a href="https://github.com/Luckymin" target="_blank" >
+            <i class="icon icon-lg icon-github"></i>Github
+          </a>
+        </li>
+    
+        <li class="waves-block">
+          <a href="http://weibo.com/staringmake" target="_blank" >
+            <i class="icon icon-lg icon-weibo"></i>Weibo
+          </a>
+        </li>
+    
+  </ul>
+
+  <footer class="footer">
+  <p><a rel="license" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0;vertical-align:middle;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAAPCAMAAABEF7i9AAAAllBMVEUAAAD///+rsapERER3d3eIiIjMzMzu7u4iIiKUmZO6v7rKzsoODg4RERFVVVUNDQ0NDg0PEA8zMzNLTEtbXltmZmZydnF9gn2AgICPkI+ZmZmqqqq7u7vFxsXIzMgNDQwZGRkgICAhISEkJSMnKCcuMC4xMzE5Ozk7PTtBQkFCQkJDQ0Nna2eGhoaHh4ezuLLGysbd3d1wVGpAAAAA4UlEQVR42q2T1xqCMAyFk7QsBQeKA9x7j/d/OSm22CpX0nzcpA1/T05aAOuBVkMAScQFHLnEwoCo2f1TnQIGoVMewjZEjVFN4GH1Ue1Cn2jWqwfsOOj6wDwGvotsl/c8lv7KIq1eLOsT0HMFHMIE/RZyHnlphryT9zyV+8WH5e8yQw3wnQvgAFxPTKUVi555SHR/lOfLMgVTeDlSfN+TaoUsiTyeIm+bCkHvCA2FUKG48LDtYBZBknsYP/G8NTw0gaaHyuQf4H5pecrB/FYCT2sL9zAfy1Xyjou6L8X2W7YcLyBZCRtnq/zfAAAAAElFTkSuQmCC" /></a></p>
+  <p>Min blog &copy; 2017</p>
+  <p>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme
+  <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a></p>
+  <a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-2x icon-rss-square"></i></a>
+</footer>
+
+</div>
+
+  </nav>
+  <main id="main">
+    <header class="header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-circle-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Android Handler 探索</div>
+        <a href="javascript:;" class="header-icon waves-circle-light" id="menu-share">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+    </div>
+</header>
+<header class="content-header">
+  <div class="container">
+    <h1 class="author">Android Handler 探索</h1>
+    <h5 class="subtitle">2016-04-27</h5>
+  </div>
+</header>
+
+    <div class="container body-wrap">
+      
+  <article id="post-2016042710_Handler详解" class="article article-type-post" itemscope itemprop="blogPost">
+    
+      <div class="post-meat flex-row">
+        <div class="flex-col">
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android-深入解析/">Android 深入解析</a></li></ul>
+</div>
+      </div>
+      <div class="post-body">
+
+        <aside class="post-widget" id="post-widget">
+
+          
+          <div class="post-share" id="post-share" data-title="Android Handler 探索" data-pic="/img/logo.jpeg" data-summary="&lt;p&gt;众所周知在 UI 线程中不能执行耗时操作，否则 UI 线程将会堵塞造成应用卡顿甚至异常报错，因此我们往往会将耗时操作放在工作线程中，但是这些任务往往需要更新 UI 组件的状态，但是对 UI 组件的操作只能在 UI 线程中执行，Android 为了处理这个问题，提供了一个消息传递机制 &lt;strong&gt;&lt;a href=&quot;https://developer.android.com/reference/android/os/Handler.html&quot;&gt;Handler&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;" data-url="http://yoursite.com/2016/04/27/2016042710_Handler详解/index.html">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+          
+
+          
+          <nav class="post-toc-wrap" id="post-toc">
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#u4E00_u3001_u6D88_u606F_u4F20_u9012_u673A_u5236_u4E2D_u7684_u5206_u5DE5"><span class="post-toc-text">一、消息传递机制中的分工</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Handler"><span class="post-toc-text">Handler</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Message"><span class="post-toc-text">Message</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#MessageQueue"><span class="post-toc-text">MessageQueue</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Looper"><span class="post-toc-text">Looper</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#u4E8C_u3001Message_u7684_u795E_u5947_u5192_u9669"><span class="post-toc-text">二、Message的神奇冒险</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#u4E09_u3001_u603B_u7ED3"><span class="post-toc-text">三、总结</span></a></li></ol>
+          </nav>
+          
+        </aside>
+
+        <div class="post-main">
+
+            <div class="post-content" itemprop="postContent"><p>众所周知在 UI 线程中不能执行耗时操作，否则 UI 线程将会堵塞造成应用卡顿甚至异常报错，因此我们往往会将耗时操作放在工作线程中，但是这些任务往往需要更新 UI 组件的状态，但是对 UI 组件的操作只能在 UI 线程中执行，Android 为了处理这个问题，提供了一个消息传递机制 <strong><a href="https://developer.android.com/reference/android/os/Handler.html" target="_blank" rel="external">Handler</a></strong></p>
+<a id="more"></a> 
+<h2 id="u4E00_u3001_u6D88_u606F_u4F20_u9012_u673A_u5236_u4E2D_u7684_u5206_u5DE5"><a href="#u4E00_u3001_u6D88_u606F_u4F20_u9012_u673A_u5236_u4E2D_u7684_u5206_u5DE5" class="headerlink" title="一、消息传递机制中的分工"></a>一、消息传递机制中的分工</h2><p>在这个消息传递机制中 Handler 和 Message 是我们平时接触最多的，而在这幕后还有 MessageQueue 和 Looper 默默的工作着，接下来让我们跳开细节来看看它们这这个机制中都担任什么样的角色</p>
+<h3 id="Handler"><a href="#Handler" class="headerlink" title="Handler"></a>Handler</h3><p>在平常的使用中我们经常会在工作线程中调用 Handler 的 sendMessage() 方法发送一个 Message 对象，然后 Handler 的 handleMessage() 方法会被回调到并且可以拿到使用 sendMessage() 发送的 Message 对象，并且 handleMessage() 方法是在 UI 线程中被执行的，这也是我们经常使用的方法但是在这背后到底发送了什么，我们大多数人并不了解。</p>
+<h3 id="Message"><a href="#Message" class="headerlink" title="Message"></a>Message</h3><p>Message 是容纳任意数据的容器。Message 就像一封信一样，上面记载了内容、时间、寄到哪里等等信息。</p>
+<ul>
+<li>what – 标识符，Handler 能够根据它区分不同的消息来源，采取不同的处理方式</li>
+<li>when – 发送出去的时间，如果调用的不是 sendMessageDelayed() 方法那么 when 将等于  SystemClock.uptimeMillis() ，这个方法将会返回当前时间。</li>
+<li>target – 表示由哪个 Handler 处理这个 Message ，也就是将 Message 发送出去的那个 Handler 。</li>
+</ul>
+<p>至于其他的 obj、arg1、arg2 等参数就是用来存储数据的容器这里就不在赘述了。</p>
+<h3 id="MessageQueue"><a href="#MessageQueue" class="headerlink" title="MessageQueue"></a>MessageQueue</h3><p>MessageQueue 是一个消息体对象的 LinkedList 集合。它按照时序（Message.when）将消息插入队列，最小的时间戳将会被首先处理，消息队列将会通过  SystemClock.uptimeMillis() 获取当前时间，当一个 Message 的时间戳(Message.when) 低于这个值的时候，消息就会分发给 Handler 处理。</p>
+<h3 id="Looper"><a href="#Looper" class="headerlink" title="Looper"></a>Looper</h3><p>Looper 从消息队列中读取消息，然后分发给对应的 Handler 处理。一旦消息的时间戳低于当前时间，那么 Looper就会在下一轮读取过程中读取到它。Looper 在没有消息分发的时候会变为堵塞状态，当有消息可用时将会继续轮询</p>
+<h2 id="u4E8C_u3001Message_u7684_u795E_u5947_u5192_u9669"><a href="#u4E8C_u3001Message_u7684_u795E_u5947_u5192_u9669" class="headerlink" title="二、Message的神奇冒险"></a>二、Message的神奇冒险</h2><p>在上面的篇章中我们叙述了消息处理机制中每个角色所承担的责任，接下来让我们来了解下消息处理机制是怎么运行的。</p>
+<p>首先我们应该知道的是为什么 Message 在工作线程中发出，却能在 UI 线程中被处理呢？那必定是因为负责消息分发的 Looper 是在 UI 线程中进行的对消息的处理，当 Handler 调用 sendMessage() 等类似方法时，Message 仅仅是在被加入到 MessageQueue 队列中，并没有和 Looper 有任何实际的接触，而在另外一边处于 UI 线程的 Looper 一直处于堵塞状态等待着 MessageQueue 队列有新的 Message 被加入，当 Looper 发现有 Message 加入时，将进入轮询状态，根据 Message 的发出时间在合适的时候将 Message 下发到对应的回调中进行处理，</p>
+<p>如果上面这一段话看懂了那么对于消息处理机制也就明白了大半了，既然 Looper 是在 UI 线程中运行处理 Message 的那么我们可以知道的是 Looper 必定也是在 UI 线程中被创建的，我们先来看看 Handler 是怎么发送 Message 的，下面这两种对于 Handler 是我们最常用的方法。</p>
+<p>第一次方法：使用 sendMessage()、sendMessageDelayed()、sendMessageAtTime() 等方法发送消息</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// UI 线程中创建 Handler</span></span><br><span class="line">Handler <span class="keyword">handler</span> = <span class="keyword">new</span> Handler() &#123;</span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.handleMessage(msg);</span><br><span class="line">        <span class="comment">//UI 线程中处理消息</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line">    </span><br><span class="line"><span class="comment">//工作线程中发出消息</span></span><br><span class="line"><span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//耗时操作</span></span><br><span class="line">        <span class="comment">//....</span></span><br><span class="line">        Message message = Message.obtain();</span><br><span class="line">        <span class="keyword">handler</span>.sendMessage(message);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;).start();</span><br></pre></td></tr></table></figure>
+<p>第二种方法：使用 post()、postDelayed()、postAtTime() 等方法发送消息</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// UI 线程中创建 Handler</span></span><br><span class="line">Handler <span class="keyword">handler</span> = <span class="keyword">new</span> Handler();</span><br><span class="line"></span><br><span class="line"><span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//耗时操作</span></span><br><span class="line">        <span class="comment">//....</span></span><br><span class="line">        <span class="keyword">handler</span>.post(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="annotation">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">               <span class="comment">// 在 UI 线程中被回调</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;).start();</span><br></pre></td></tr></table></figure>
+<p>上面两种方法其实并没有什么不同 Handler.post() 其实只是在 sendMessageDelayed() 上面加了一层封装，我们可以看下 Handler.post() 的代码</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="function"><span class="keyword">boolean</span> <span class="title">post</span><span class="params">(Runnable r)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span>  sendMessageDelayed(getPostMessage(r), <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="function">Message <span class="title">getPostMessage</span><span class="params">(Runnable r)</span> </span>&#123;</span><br><span class="line">    Message m = Message.obtain();</span><br><span class="line">    m.callback = r;</span><br><span class="line">    <span class="keyword">return</span> m;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到 Handler.post() 方法最后调用的还是 sendMessageDelayed() 方法，而 sendMessageDelayed() 又是调用的 sendMessageAtTime() 方法，其他的 postDelayed()、postAtTime() 方法想必都能猜到了最后也都是调用到 sendMessageAtTime() 方法。我们可以看下 sendMessageAtTime() 的代码</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">boolean</span> <span class="title">sendMessageAtTime</span><span class="params">(Message msg, <span class="keyword">long</span> uptimeMillis)</span> </span>&#123;</span><br><span class="line">    MessageQueue queue = mQueue;</span><br><span class="line">    <span class="keyword">if</span> (queue == <span class="keyword">null</span>) &#123;</span><br><span class="line">        RuntimeException e = <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                    <span class="keyword">this</span> + <span class="string">" sendMessageAtTime() called with no mQueue"</span>);</span><br><span class="line">        Log.w(<span class="string">"Looper"</span>, e.getMessage(), e);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">return</span> <span class="title">enqueueMessage</span><span class="params">(queue, msg, uptimeMillis)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">boolean</span> <span class="title">enqueueMessage</span><span class="params">(MessageQueue queue, Message msg, <span class="keyword">long</span> uptimeMillis)</span> </span>&#123;</span><br><span class="line">    msg.<span class="keyword">target</span> = <span class="keyword">this</span>;</span><br><span class="line">    <span class="keyword">if</span> (mAsynchronous) &#123;</span><br><span class="line">        msg.setAsynchronous(<span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">return</span> queue.<span class="title">enqueueMessage</span><span class="params">(msg, uptimeMillis)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面这一大段代码最重要的就是第 12 行和第 16 行了，我们之前说过 Message 的 target 字段表示由哪一个 Handler 来回调处理这个消息，而这里的 target = this 也就表示了将由调用了 sendMessageAtTime 方法的 Handler 来处理。之后在第 16 行将 Message 加入到 MessageQueue 队列中。</p>
+<p>我们可以继续深入来看看 queue.enqueueMessage(msg, uptimeMillis) 到底做了什么</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">boolean <span class="title">enqueueMessage</span>(<span class="params">Message msg, <span class="keyword">long</span> <span class="keyword">when</span></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (msg.target == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Message must have a target."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (msg.isInUse()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(msg + <span class="string">" This message is already in use."</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    synchronized (<span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (mQuitting) &#123;</span><br><span class="line">            IllegalStateException e = <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">                        msg.target + <span class="string">" sending message to a Handler on a dead thread"</span>);</span><br><span class="line">            Log.w(TAG, e.getMessage(), e);</span><br><span class="line">            msg.recycle();</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        msg.markInUse();</span><br><span class="line">        msg.<span class="keyword">when</span> = <span class="keyword">when</span>;</span><br><span class="line">        Message p = mMessages;</span><br><span class="line">        boolean needWake;</span><br><span class="line">        <span class="keyword">if</span> (p == <span class="keyword">null</span> || <span class="keyword">when</span> == <span class="number">0</span> || <span class="keyword">when</span> &lt; p.<span class="keyword">when</span>) &#123;</span><br><span class="line">            <span class="comment">// New head, wake up the event queue if blocked.</span></span><br><span class="line">            msg.next = p;</span><br><span class="line">            mMessages = msg;</span><br><span class="line">            needWake = mBlocked;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Inserted within the middle of the queue.  Usually we don't have to wake</span></span><br><span class="line">            <span class="comment">// up the event queue unless there is a barrier at the head of the queue</span></span><br><span class="line">            <span class="comment">// and the message is the earliest asynchronous message in the queue.</span></span><br><span class="line">            needWake = mBlocked &amp;&amp; p.target == <span class="keyword">null</span> &amp;&amp; msg.isAsynchronous();</span><br><span class="line">            Message prev;</span><br><span class="line">            <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">                prev = p;</span><br><span class="line">                p = p.next;</span><br><span class="line">                <span class="keyword">if</span> (p == <span class="keyword">null</span> || <span class="keyword">when</span> &lt; p.<span class="keyword">when</span>) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (needWake &amp;&amp; p.isAsynchronous()) &#123;</span><br><span class="line">                    needWake = <span class="keyword">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            msg.next = p; <span class="comment">// invariant: p == prev.next</span></span><br><span class="line">            prev.next = msg;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// We can assume mPtr != 0 because mQuitting is false.</span></span><br><span class="line">        <span class="keyword">if</span> (needWake) &#123;</span><br><span class="line">            nativeWake(mPtr);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个方法里主要做了两件事情，使用 msg.when 保存消息发出的时间，之后根据 when 对消息队列进行排序，同时我们也能看出来 MessageQueue 并没有用一个集合将所有的 Message 保存起来，它只是使用了一个 mMessage 对象表示当前需要处理的消息，而下一个需要处理的消息被保存在了 Message.next 中，从 20 - 45 行的代码中我们也能看到这个队列根据 when 被排序，每一个 Message 指定了下一个要被处理的 Message 由此组成了一个按照时间先后顺序等待被处理的 MessageQueue。</p>
+<p>剩下的就是 Looper 了，Looper 可能是大家最陌生的一块了，Looper 什么时候被创建的，又是怎么运行着呢，我们可以看看 Handler 的构造方法来探寻 Looper 的轨迹</p>
+<figure class="highlight monkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Handler(Callback callback, boolean async) &#123;</span><br><span class="line">    <span class="keyword">if</span> (FIND_POTENTIAL_LEAKS) &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="class"><span class="keyword">Class</span>&lt;? <span class="keyword">extends</span> <span class="title">Handler</span>&gt; <span class="title">klass</span> = <span class="title">getClass</span>();</span></span><br><span class="line">        <span class="keyword">if</span> ((klass.isAnonymousClass() || klass.isMemberClass() || klass.isLocalClass()) &amp;&amp;</span><br><span class="line">                    (klass.getModifiers() &amp; Modifier.STATIC) == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">Log</span>.w(TAG, <span class="string">"The following Handler class should be static or leaks might occur: "</span> +</span><br><span class="line">                    klass.getCanonicalName());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mLooper = Looper.myLooper();</span><br><span class="line">    <span class="keyword">if</span> (mLooper == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                <span class="string">"Can't create handler inside thread that has not called Looper.prepare()"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    mQueue = mLooper.mQueue;</span><br><span class="line">    mCallback = callback;</span><br><span class="line">    mAsynchronous = async;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到第 11-15 行对 Looper 对象做了一个非空判断，如果为空那么将会抛出异常，同时在第 17 行 Handler 从Looper拿到了一个 mQueue 这个 mQueue 就是 MessageQueue ，上面的sendMessage() 等方法最后就是将 Message 加入到这个 mQueue 中的。</p>
+<p>我们可以继续进入到 Looper.myLooper() 方法中去看看</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sThreadLocal.get() will return null unless you've called prepare().</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Looper&gt; sThreadLocal = <span class="keyword">new</span> ThreadLocal&lt;Looper&gt;();</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="annotation">@Nullable</span> <span class="function">Looper <span class="title">myLooper</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">return</span> sThreadLocal.<span class="title">get</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以看到 Looper 就保存在 sThreadLocal 这个静态的常量中，不过我们发现这个常量上面还有一段注释意思为：sThreadLocal.get() 将返回 null ，除非你调用了 prepare()，我们知道如果返回了 null 那么在 Handler 的构造方法中将会抛出异常，但是事实上在我们日常的使用过程中并没有遇到这个异常，那么就说明 prepare() 这个方法在我们所不知道的地方被调用过了，不过现在让我们暂时跳过这个细节，继续看 sThreadLocal.get() 里面到底做了什么</p>
+<figure class="highlight lasso"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> T get() &#123;</span><br><span class="line">    <span class="keyword">Thread</span> t = <span class="keyword">Thread</span><span class="built_in">.</span>currentThread();</span><br><span class="line">    ThreadLocalMap <span class="built_in">map</span> = getMap(t);</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">map</span> != <span class="built_in">null</span>) &#123;</span><br><span class="line">        ThreadLocalMap<span class="built_in">.</span>Entry e = <span class="built_in">map</span><span class="built_in">.</span>getEntry(this);</span><br><span class="line">        <span class="keyword">if</span> (e != <span class="built_in">null</span>)</span><br><span class="line">            <span class="keyword">return</span> (T)e<span class="built_in">.</span>value;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> setInitialValue();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ThreadLocalMap getMap(<span class="keyword">Thread</span> t) &#123;</span><br><span class="line">    <span class="keyword">return</span> t<span class="built_in">.</span>threadLocals;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以看到代码的第二行调用了 Thread.currentThread() 拿到当前线程对象，调用了 getMap() 获取到了 ThreadLocalMap 从 getMap 这个方法里我们可以看到 ThreadLocalMap 是保存在 Thread 对象里的一个属性，之后又经过一系列的调用从 ThreadLocalMap 中拿到了 Looper ，我们可以不用管 ThreadLocalMap 到底是什么不过从这个类的名字以及之后调用的代码我们可以大概猜到，Looper 存放在一个类似于 Map 的集合中，ThreadLocalMap 又保存在当前线程中，由此我们可以推断出 Looper 是和当前线程绑定在一起的，且依赖于当前线程的。</p>
+<p>说了这么多那么 Looper.prepare() 到底是什么时候调用的呢？其实在程序被启动时，系统就已经帮我们调用了 Looper.prepare() 方法，这段代码就在 ActivityThread 的 main() 方法中</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(<span class="keyword">String</span>[] args) &#123;</span><br><span class="line">    Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, <span class="string">"ActivityThreadMain"</span>);</span><br><span class="line">    SamplingProfilerIntegration.start();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// CloseGuard defaults to true and can be quite spammy.  We</span></span><br><span class="line">    <span class="comment">// disable it here, but selectively enable it later (via</span></span><br><span class="line">    <span class="comment">// StrictMode) on debug builds, but using DropBox, not logs.</span></span><br><span class="line">    CloseGuard.setEnabled(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">    Environment.initForCurrentUser();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set the reporter for event logging in libcore</span></span><br><span class="line">    EventLogger.setReporter(<span class="keyword">new</span> EventLoggingReporter());</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Make sure TrustedCertificateStore looks in the right place for CA certificates</span></span><br><span class="line">    <span class="keyword">final</span> File configDir = Environment.getUserConfigDirectory(UserHandle.myUserId());</span><br><span class="line">    TrustedCertificateStore.setDefaultUserDirectory(configDir);</span><br><span class="line"></span><br><span class="line">    Process.setArgV0(<span class="string">"&lt;pre-initialized&gt;"</span>);</span><br><span class="line"></span><br><span class="line">    Looper.prepareMainLooper();</span><br><span class="line"></span><br><span class="line">    ActivityThread thread = <span class="keyword">new</span> ActivityThread();</span><br><span class="line">    thread.attach(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (sMainThreadHandler == <span class="keyword">null</span>) &#123;</span><br><span class="line">        sMainThreadHandler = thread.getHandler();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">false</span>) &#123;</span><br><span class="line">        Looper.myLooper().setMessageLogging(<span class="keyword">new</span></span><br><span class="line">                    LogPrinter(Log.DEBUG, <span class="string">"ActivityThread"</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// End of event ActivityThreadMain.</span></span><br><span class="line">    Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</span><br><span class="line">    Looper.<span class="built_in">loop</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Main thread loop unexpectedly exited"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在第 21 行调用了 Looper.prepareMainLooper() 第 37 行调用了 Looper.loop() 这两行是和 Looper 有关的代码，我们先来看看 Looper.prepareMainLooper() 做了什么</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">void</span> <span class="title">prepareMainLooper</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    prepare(<span class="keyword">false</span>);</span><br><span class="line">    <span class="keyword">synchronized</span> (Looper.class) &#123;</span><br><span class="line">        <span class="keyword">if</span> (sMainLooper != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"The main Looper has already been prepared."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        sMainLooper = myLooper();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="function"><span class="keyword">void</span> <span class="title">prepare</span><span class="params">(<span class="keyword">boolean</span> quitAllowed)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (sThreadLocal.get() != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Only one Looper may be created per thread"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    sThreadLocal.set(<span class="keyword">new</span> Looper(quitAllowed));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到在 prepareMainLooper() 中调用了 prepare() 方法，在 prepare() 方法中又调用了 sThreadLocal.set(new Looper(quitAllowed)) 这段代码刚好对应了之前的 sThreadLocal.get() 代码，并且在调用 sThreadLocal.set() 之前首先调用了 sThreadLocal.get() 判断是否为 null，从 13 行的错误信息也可以看出来，每个线程只能创建一个 Looper，这也验证了我们上面的想法，Thread 只有一个 threadLocals 属性用于保存 Looper，所以就没必要再创建一个 Looper 了，当然这只是表面的原因，至于为什么只能有一个 Looper 就只有更加深入研究 Android 源码才能知道了，不过这个就不在本篇博文的范围了。</p>
+<p>看完了 prepareMainLooper() 让我们接着往下看第 37 行的 Looper.loop() 又做了什么</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="function"><span class="keyword">void</span> <span class="title">loop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> Looper me = myLooper();</span><br><span class="line">    <span class="keyword">if</span> (me == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"No Looper; Looper.prepare() wasn't called on this thread."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> MessageQueue queue = me.mQueue;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Make sure the identity of this thread is that of the local process,</span></span><br><span class="line">    <span class="comment">// and keep track of what that identity token actually is.</span></span><br><span class="line">    Binder.clearCallingIdentity();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> ident = Binder.clearCallingIdentity();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        Message msg = queue.next(); <span class="comment">// might block</span></span><br><span class="line">        <span class="keyword">if</span> (msg == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// No message indicates that the message queue is quitting.</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// This must be in a local variable, in case a UI event sets the logger</span></span><br><span class="line">        <span class="keyword">final</span> Printer logging = me.mLogging;</span><br><span class="line">        <span class="keyword">if</span> (logging != <span class="keyword">null</span>) &#123;</span><br><span class="line">            logging.println(<span class="string">"&gt;&gt;&gt;&gt;&gt; Dispatching to "</span> + msg.<span class="keyword">target</span> + <span class="string">" "</span> +</span><br><span class="line">                        msg.callback + <span class="string">": "</span> + msg.what);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">long</span> traceTag = me.mTraceTag;</span><br><span class="line">        <span class="keyword">if</span> (traceTag != <span class="number">0</span> &amp;&amp; Trace.isTagEnabled(traceTag)) &#123;</span><br><span class="line">            Trace.traceBegin(traceTag, msg.<span class="keyword">target</span>.getTraceName(msg));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            msg.<span class="keyword">target</span>.dispatchMessage(msg);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (traceTag != <span class="number">0</span>) &#123;</span><br><span class="line">                Trace.traceEnd(traceTag);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (logging != <span class="keyword">null</span>) &#123;</span><br><span class="line">            logging.println(<span class="string">"&lt;&lt;&lt;&lt;&lt; Finished to "</span> + msg.<span class="keyword">target</span> + <span class="string">" "</span> + msg.callback);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Make sure that during the course of dispatching the</span></span><br><span class="line">        <span class="comment">// identity of the thread wasn't corrupted.</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">long</span> newIdent = Binder.clearCallingIdentity();</span><br><span class="line">        <span class="keyword">if</span> (ident != newIdent) &#123;</span><br><span class="line">            Log.wtf(TAG, <span class="string">"Thread identity changed from 0x"</span></span><br><span class="line">                        + Long.toHexString(ident) + <span class="string">" to 0x"</span></span><br><span class="line">                        + Long.toHexString(newIdent) + <span class="string">" while dispatching to "</span></span><br><span class="line">                        + msg.<span class="keyword">target</span>.getClass().getName() + <span class="string">" "</span></span><br><span class="line">                        + msg.callback + <span class="string">" what="</span> + msg.what);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        msg.recycleUnchecked();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以从第 13 行看起在这里 Looper 构建了一个死循环，在没有消息进入时程序将会一直堵塞在第 14 行的 queue.next() 处，等待着新的 Message 被加入，当有消息被加入时，Looper 将被唤醒调用到第 32 行的代码进行下发，msg.target 大家应该还没有忘记是什么，就是调用了 sendMessage() 方法的 Handler 。我们可以继续看看 dispatchMessage 是怎么分发消息的</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">dispatchMessage</span><span class="params">(Message msg)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (msg.callback != <span class="keyword">null</span>) &#123;</span><br><span class="line">        handleCallback(msg);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (mCallback != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mCallback.handleMessage(msg)) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        handleMessage(msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>msg.callback 就是调用 Handler.post() 传入的 Runnable，mCallback 是 Handler 本事的回调参数，可以看到 mCallback 如果不为 null 那么将会被优先回调，并且根据放回值来觉得是否回调重构方法 handleMessage()。上面这个过程很简单大家应该不会被绕晕吧。</p>
+<h2 id="u4E09_u3001_u603B_u7ED3"><a href="#u4E09_u3001_u603B_u7ED3" class="headerlink" title="三、总结"></a>三、总结</h2><p>可能由于篇幅太长所以大家看的有点迷糊，在这里让我们再来总结下消息处理机制是怎么运作的。</p>
+<p>首先如果你是在主线程中创建 Handler 那么无需调用 Looper.prepare() 创建 Looper 也无需调用 Looper.loop() 来让 Looper 运行起来，因为在程序启动时系统已经为我们在主线程中调用了这些代码。当然也不要忘了当 Looper 被创建时 Looper 内部会生成 MessageQueue 消息队列，当 Handler 实例化时会去 Looper 中获取 MessageQueue 的引用，以便将 Message 加入到消息队列中。</p>
+<p>当 Handler 创建完成之后，我们就可以调用 sendMessage() 等方法了，这些方法最后会将 Message 添加到 MessageQueue 中，而 MessageQueue 在添加 Message 之前会根据 Message 的发送时间进行排序，越早被发送出去的就排在前面，同时会持有下一个将被发送的 Message 的引用，依次循环。</p>
+<p>在另外一边，Looper 构建了一个死循环堵塞在 queue.next() 处等待着 Message 被加入，但是不能忘了，Looper 是依附于线程的，我们能在主线程中重新接收到 Message 是因为我们是在主线程中创建的 Handler 拿到到的是主线程 Looper 中的 MessageQueue 消息队列，所以我们才能在主线程中回调到，如果我们是在其他线程中创建的 Handler 那么就会在这个线程中接收到消息。</p>
+<p>当 Looper 拿到 Message 后，将会调用 Message.target.dispatchMessage() 进行分发，Message.target 就是发送出 Message 的 Handler。dispatchMessage 被调用后会重新回到 post 里的 Runnable 或者是 handleMessage 方法等。</p>
+<p>上面就是当一个 Message 被发出后，在到被重新接收到的一个完整过程，不过这里我们也会产生一个疑问。为什么主线程的 Looper 里面构建一个死循环后，主线程不会被堵塞呢，这个问题在知乎上也有一个提问，我们可以在这里面找到答案</p>
+<p><a href="https://www.zhihu.com/question/34652589" target="_blank" rel="external">Android中为什么主线程不会因为Looper.loop()里的死循环卡死？</a></p>
+<p>本篇博文到此结束，感谢阅读。</p>
+</div>
+
+            
+<nav class="post-nav flex-row">
+  <div class="flex-col waves-block prev">
+    
+      <a href="/2017/04/17/2017041716_发送消息到其他应用/" title="发送数据到其他应用-关于知乎的分享是如何实现" id="post-prev" class="post-nav-link">
+        <i class="icon icon-chevron-left"></i>
+        <span class="article-nav-title">上一篇</span>
+      </a>
+    
+  </div>
+  <div class="flex-col waves-block next">
+    
+      <a href="/2016/03/16/2016031610_在AndroidStudio中支持Java8/" title="在 Android Studio 中支持 Java 8" id="post-next" class="post-nav-link">
+        <span class="article-nav-title">下一篇</span>
+        <i class="icon icon-chevron-right"></i>
+      </a>
+    
+  </div>
+
+</nav>
+
+
+
+            
+
+
+
+
+        </div>
+
+      </div>
+
+    
+
+  </article>
+
+
+
+    </div>
+  </main>
+<div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-circle-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+<div class="global-share" id="global-share" data-title="Android Handler 探索" data-pic="/img/logo.jpeg" data-summary="&lt;p&gt;众所周知在 UI 线程中不能执行耗时操作，否则 UI 线程将会堵塞造成应用卡顿甚至异常报错，因此我们往往会将耗时操作放在工作线程中，但是这些任务往往需要更新 UI 组件的状态，但是对 UI 组件的操作只能在 UI 线程中执行，Android 为了处理这个问题，提供了一个消息传递机制 &lt;strong&gt;&lt;a href=&quot;https://developer.android.com/reference/android/os/Handler.html&quot;&gt;Handler&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;" data-url="http://yoursite.com/2016/04/27/2016042710_Handler详解/index.html">
+    <div class="tit">分享到：</div>
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" href="javascript:;" data-title="微博" data-service="tsina">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns" href="javascript:;" data-title="微信" data-service="weixin">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" href="javascript:;" data-title=" QQ" data-service="cqq">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" href="javascript:;" data-title=" Facebook" data-service="fb">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" href="javascript:;" data-title=" Twitter" data-service="twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="douban share-sns" href="javascript:;" data-title="豆瓣" data-service="douban">
+          豆
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+<script type="text/javascript">
+var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+document.write(unescape("%3Cspan id='cnzz_stat_icon_1257735577' style='display:none' %3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s95.cnzz.com/z_stat.php%3Fid%3D1257735577%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));
+</script>
+
+
+
+
+
+
+</body>
+</html>
